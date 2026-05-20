@@ -12,9 +12,16 @@ public class PrefabManager : SingletonInstance<PrefabManager>, IManager
     public enum Prefabs_Data
     {
         Player,
+        Ground,
+        LobbyCanvas,
     }
 
-    async public UniTask Init()
+    public override void Init()
+    {
+        base.Init();
+    }
+
+    async public UniTask LoadAssetReference()
     {
         _assetReference = await AddressableManager.Instance.LoadResourceData<PrefabAssetReference>(nameof(PrefabAssetReference));
         AssetReferenceMapping();

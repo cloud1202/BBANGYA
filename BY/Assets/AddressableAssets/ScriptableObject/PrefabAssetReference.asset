@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: daa4aa966976ded43851ec4e941a65f4, type: 3}
-  m_Name: PrefabResourceData
+  m_Name: PrefabAssetReference
   m_EditorClassIdentifier: 
   assetDatas:
   - id: 0
@@ -20,5 +20,20 @@ MonoBehaviour:
       m_SubObjectType: 
       m_SubObjectGUID: 
       m_EditorAssetChanged: 0
-    labels: []
-    labelForString: 
+    containLabel: 1
+  - id: 1
+    data:
+      m_AssetGUID: cf65ad7cb881144458120605b50d9990
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_SubObjectGUID: 
+      m_EditorAssetChanged: 0
+    containLabel: 1
+  - id: 2
+    data:
+      m_AssetGUID: 144621b0102c8154d9ec614f26f7b228
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_SubObjectGUID: 
+      m_EditorAssetChanged: 0
+    containLabel: 1

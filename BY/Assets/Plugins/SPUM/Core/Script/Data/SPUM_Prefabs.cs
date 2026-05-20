@@ -14,7 +14,8 @@ public enum PlayerState
     DEATH,
     OTHER,
     SPRINT,
-    DEFENCE,
+    HOLDING,
+    JUMP,
 }
 public class SPUM_Prefabs : MonoBehaviour
 {
@@ -37,7 +38,8 @@ public class SPUM_Prefabs : MonoBehaviour
     public List<AnimationClip> DEATH_List = new();
     public List<AnimationClip> OTHER_List = new();
     public List<AnimationClip> SPRINT_List = new();
-    public List<AnimationClip> DEFENCE_List = new();
+    public List<AnimationClip> HOLDING_List = new();
+    public List<AnimationClip> JUMP_List = new();
     public void OverrideControllerInit()
     {
         Animator animator = _anim;
@@ -84,8 +86,11 @@ public class SPUM_Prefabs : MonoBehaviour
                 case "SPRINT":
                     StateAnimationPairs[stateText] = SPRINT_List;
                     break;
-                case "DEFENCE":
-                    StateAnimationPairs[stateText] = DEFENCE_List;
+                case "HOLDING":
+                    StateAnimationPairs[stateText] = HOLDING_List;
+                    break;
+                case "JUMP":
+                    StateAnimationPairs[stateText] = JUMP_List;
                     break;
             }
         }
@@ -109,7 +114,8 @@ public class SPUM_Prefabs : MonoBehaviour
         DEATH_List = new();
         OTHER_List = new();
         SPRINT_List = new();
-        DEFENCE_List = new();
+        HOLDING_List = new();
+        JUMP_List = new();
         
         var groupedClips = spumPackages
         .SelectMany(package => package.SpumAnimationData)
@@ -166,8 +172,12 @@ public class SPUM_Prefabs : MonoBehaviour
                     SPRINT_List.AddRange(orderedClips.Select(clip => LoadAnimationClip(clip.ClipPath)));
                     //StateAnimationPairs[stateType] = SPRINT_List;
                     break;
-                case "DEFENCE":
-                    DEFENCE_List.AddRange(orderedClips.Select(clip => LoadAnimationClip(clip.ClipPath)));
+                case "HOLDING":
+                    HOLDING_List.AddRange(orderedClips.Select(clip => LoadAnimationClip(clip.ClipPath)));
+                    //StateAnimationPairs[stateType] = SPRINT_List;
+                    break;
+                case "JUMP":
+                    JUMP_List.AddRange(orderedClips.Select(clip => LoadAnimationClip(clip.ClipPath)));
                     //StateAnimationPairs[stateType] = SPRINT_List;
                     break;
             }

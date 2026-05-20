@@ -14,6 +14,7 @@ public class InputManager : SingletonInstance<InputManager>, IManager
         Player_RightAttack,
         Player_LeftAttack,
         Player_Sprint,
+        Player_Jump,
     }
     private PlayerInput _inputHandler;
     public override void Init()
@@ -23,7 +24,7 @@ public class InputManager : SingletonInstance<InputManager>, IManager
         _inputHandler.Player.Enable();
     }
 
-    private void SubscribeToInputHandler(InputType type, Action<CallbackContext> action, bool isStart, bool isPerform, bool isCancel)
+    private void SubscribeToInputHandler(InputType type, Action<CallbackContext> start, Action<CallbackContext> perform, Action<CallbackContext> cancel)
     {
         InputAction input = null;
         switch (type)
@@ -43,43 +44,51 @@ public class InputManager : SingletonInstance<InputManager>, IManager
             case InputType.Player_Sprint:
                 input = _inputHandler.Player.Sprint;
                 break;
+            case InputType.Player_Jump:
+                input = _inputHandler.Player.Sprint;
+                break;
         }
 
         if (input == null)
             return;
 
-        if (isStart)
-            input.started += action;
+        if (start != null)
+            input.started += start;
 
-        if (isPerform)
-            input.performed += action;
+        if (perform != null)
+            input.performed += perform;
 
-        if (isCancel)
-            input.canceled += action;
+        if (cancel != null)
+            input.canceled += cancel;
     }
 
-    public void SubscribeToPlayerMove(Action<CallbackContext> action, bool isStart, bool isPerform, bool isCancel)
+    public void SubscribeToPlayerMove(Action<CallbackContext> start = null, Action<CallbackContext> perform = null, Action<CallbackContext> cancel = null)
     {
-        SubscribeToInputHandler(InputType.Player_Move, action, isStart, isPerform, isCancel);
+        SubscribeToInputHandler(InputType.Player_Move, start, perform, cancel);
     }
 
-    public void SubscribeToPlayerInteract(Action<CallbackContext> action, bool isStart, bool isPerform, bool isCancel)
+    public void SubscribeToPlayerInteract(Action<CallbackContext> start = null, Action<CallbackContext> perform = null, Action<CallbackContext> cancel = null)
     {
-        SubscribeToInputHandler(InputType.Player_Interact, action, isStart, isPerform, isCancel);
+        SubscribeToInputHandler(InputType.Player_Interact, start, perform, cancel);
     }
 
-    public void SubscribeToPlayerRightAttack(Action<CallbackContext> action, bool isStart, bool isPerform, bool isCancel)
+    public void SubscribeToPlayerRightAttack(Action<CallbackContext> start = null, Action<CallbackContext> perform = null, Action<CallbackContext> cancel = null)
     {
-        SubscribeToInputHandler(InputType.Player_RightAttack, action, isStart, isPerform, isCancel);
+        SubscribeToInputHandler(InputType.Player_RightAttack, start, perform, cancel);
     }
 
-    public void SubscribeToPlayerLeftAttack(Action<CallbackContext> action, bool isStart, bool isPerform, bool isCancel)
+    public void SubscribeToPlayerLeftAttack(Action<CallbackContext> start = null, Action<CallbackContext> perform = null, Action<CallbackContext> cancel = null)
     {
-        SubscribeToInputHandler(InputType.Player_LeftAttack, action, isStart, isPerform, isCancel);
+        SubscribeToInputHandler(InputType.Player_LeftAttack, start, perform, cancel);
     }
 
-    public void SubscribeToPlayerSprint(Action<CallbackContext> action, bool isStart, bool isPerform, bool isCancel)
+    public void SubscribeToPlayerSprint(Action<CallbackContext> start = null, Action<CallbackContext> perform = null, Action<CallbackContext> cancel = null)
     {
-        SubscribeToInputHandler(InputType.Player_Sprint, action, isStart, isPerform, isCancel);
+        SubscribeToInputHandler(InputType.Player_Sprint, start, perform, cancel);
+    }
+
+    public void SubscribeToPlayerJump(Action<CallbackContext> start = null, Action<CallbackContext> perform = null, Action<CallbackContext> cancel = null)
+    {
+        SubscribeToInputHandler(InputType.Player_Jump, start, perform, cancel);
     }
 }

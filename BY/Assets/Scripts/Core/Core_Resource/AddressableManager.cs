@@ -12,10 +12,9 @@ public class AddressableManager : SingletonInstance<AddressableManager>
     public override void Init()
     {
         base.Init();
-        SetAddressable().Forget();
     }
 
-    private async UniTask SetAddressable()
+    public async UniTask SetAddressable()
     {
         await Addressables.InitializeAsync();
         await LoadRemoteAddressable();
@@ -181,6 +180,6 @@ public class AddressableManager : SingletonInstance<AddressableManager>
 
     public async UniTask<T> LoadResourceData<T>(string name)
     {
-        return await Addressables.LoadAssetAsync<T>($"Assets/AssetResources/Addressable/DefaultResource/Data/{name}.asset");
+        return await Addressables.LoadAssetAsync<T>($"Assets/AddressableAssets/ScriptableObject/{name}.asset");
     }
 }

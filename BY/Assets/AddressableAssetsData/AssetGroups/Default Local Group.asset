@@ -19,13 +19,13 @@ MonoBehaviour:
     m_Address: Assets/AddressableAssets/ScriptableObject
     m_ReadOnly: 0
     m_SerializedLabels:
-    - default
+    - Resources
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e70a02734067ff04a81a81c20113da64
     m_Address: Assets/AddressableAssets/Prefabs
     m_ReadOnly: 0
     m_SerializedLabels:
-    - default
+    - Common
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 0d0b86c0696e3fb49ac64f1f4804b611, type: 2}

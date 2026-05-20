@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,6 +59,6 @@ public class Bootstrap : MonoBehaviour
             go.AddComponent(type);
         }
 
-        GameManager.Instance.StartGame();
+        GameManager.Instance.Bootstrap().Forget();
     }
 }

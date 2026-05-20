@@ -1,95 +1,143 @@
 using Cysharp.Threading.Tasks;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static PrefabManager;
 
+[ManagerOrder(5)]
 public class PlayerManager : SingletonInstance<PlayerManager>, IManager
 {
     private Vector2 _direction;
-    private PlayerController _player;
+    private IPlayer _player;
 
-    public override void Init() 
+    public override void Init()
     {
         base.Init();
-        LoadPlayer().Forget();
-    }
-
-    private async UniTask LoadPlayer()
-    {
-        _player = await PrefabManager.Instance.InstantiateObject<PlayerController>(Prefabs_Data.Player, this.transform);
     }
 
     void Start()
     {
-        InputManager.Instance.SubscribeToPlayerMove(OnMove, true, true, true);
-        InputManager.Instance.SubscribeToPlayerInteract(OnInteracted, true, false, false);
-        InputManager.Instance.SubscribeToPlayerRightAttack(OnRightAttack, true, false, false);
-        InputManager.Instance.SubscribeToPlayerLeftAttack(OnLeftAttack, true, false, false);
-        InputManager.Instance.SubscribeToPlayerSprint(OnSprint, true, false, false);
+        InputManager.Instance.SubscribeToPlayerMove(OnMove, OnMove, OnMove);
+        InputManager.Instance.SubscribeToPlayerRightAttack(OnRightAttack, null, OnRightAttackCancel);
+        InputManager.Instance.SubscribeToPlayerLeftAttack(OnLeftAttack);
+        InputManager.Instance.SubscribeToPlayerSprint(OnSprint);
+        InputManager.Instance.SubscribeToPlayerJump(OnJump);
+        // InputManager.Instance.SubscribeToPlayerAim(OnAim, OnAim, OnAim);
+
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
     }
 
-    private bool IsDisableAction => _player == null || _player.isAction;
+    private void OnDestroy()
+    {
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+    }
 
+    // ─────────────────────────────────────────
+    // 서버 콜백: 클라이언트 접속 시 캐릭터 스폰
+    // ─────────────────────────────────────────
+    private void OnClientConnected(ulong clientId)
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
+        Debug.Log($"[PlayerManager] OnClientConnected | clientId: {clientId}");
+        SpawnPlayerOnServer(clientId).Forget();
+    }
+
+    // ─────────────────────────────────────────
+    // 서버에서 플레이어 스폰
+    // ─────────────────────────────────────────
+    public async UniTask SpawnPlayerOnServer(ulong clientId)
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
+
+        Vector3 spawnPos = (clientId == NetworkManager.Singleton.LocalClientId)
+            ? new Vector3(-5f, 0f, 0f)
+            : new Vector3(5f, 0f, 0f);
+
+        InstantiateObject playerObj = await PrefabManager.Instance.InstantiateObject<InstantiateObject>(Prefabs_Data.Player, null);
+
+        if (playerObj == null)
+        {
+            Debug.LogError("[PlayerManager] Player 프리팹 로드 실패!");
+            return;
+        }
+
+        playerObj.transform.position = spawnPos;
+
+        NetworkObject networkObj = playerObj.GetComponent<NetworkObject>();
+        networkObj.SpawnAsPlayerObject(clientId, true);
+
+        Debug.Log($"[PlayerManager] 스폰 완료 | clientId: {clientId} | pos: {spawnPos}");
+    }
+
+    // ─────────────────────────────────────────
+    // 호스트: 게임 시작 시 본인 스폰
+    // ─────────────────────────────────────────
+    public async UniTask SpawnLocalPlayer()
+    {
+        await UniTask.WaitUntil(() => NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsConnectedClient);
+
+        if (NetworkManager.Singleton.IsHost)
+            await SpawnPlayerOnServer(NetworkManager.Singleton.LocalClientId);
+    }
+
+    // ─────────────────────────────────────────
+    // 로컬 플레이어 참조 등록
+    // ─────────────────────────────────────────
+    public void RegisterLocalPlayer(IPlayer player)
+    {
+        _player = player;
+        Debug.Log($"[PlayerManager] 로컬 플레이어 등록 완료");
+    }
+
+    // ─────────────────────────────────────────
+    // 입력 핸들러
+    // ─────────────────────────────────────────
     public void OnMove(InputAction.CallbackContext context)
     {
+        if (_player == null) return;
         _direction = context.ReadValue<Vector2>();
-    }
-
-    public void OnInteracted(InputAction.CallbackContext context)
-    {
-        if (IsDisableAction)
-            return;
-
-        _player = null;
     }
 
     public void OnRightAttack(InputAction.CallbackContext context)
     {
-        if (IsDisableAction)
-            return;
+        if (_player == null) return;
+        _player.DoHolding();
+    }
 
-        _player.isAction = true;
-        _player._prefabs._anim.Rebind();
-        _player.SetStateAnimationIndex(PlayerState.DEFENCE, 0);
-        EndPlayerAnimation(_player.PlayStateAnimation(PlayerState.DEFENCE)).Forget();
+    public void OnRightAttackCancel(InputAction.CallbackContext context)
+    {
+        if (_player == null) return;
+        _player.DoHoldingCancel();
     }
 
     public void OnLeftAttack(InputAction.CallbackContext context)
     {
-        if (IsDisableAction)
-            return;
-
-        _player.isAction = true;
-        _player._prefabs._anim.Rebind();
-        _player.SetStateAnimationIndex(PlayerState.ATTACK, 0);
-        EndPlayerAnimation(_player.PlayStateAnimation(PlayerState.ATTACK)).Forget();
+        if (_player == null) return;
+        _player.DoAttack();
     }
 
     public void OnSprint(InputAction.CallbackContext context)
     {
-        if (IsDisableAction)
-            return;
-
+        if (_player == null) return;
         _player.DoSprint();
     }
 
-    private async UniTask EndPlayerAnimation(float length)
+    public void OnJump(InputAction.CallbackContext context)
     {
-        await UniTask.WaitForSeconds(length);
+        if (_player == null) return;
+        _player.DoJump();
+    }
 
-        _player.isAction = false;
+    public void OnAim(InputAction.CallbackContext context)
+    {
+        if (_player == null) return;
+        _player.SetCursorPoint(context.ReadValue<Vector2>());
     }
 
     private void FixedUpdate()
     {
-        OnMoveHandle();
-    }
-
-    private void OnMoveHandle()
-    {
-        if (IsDisableAction)
-            return;
-
-        var goalPos = _player.SetMovePos(_direction);
+        if (_player == null) return;
+        _player.SetMoveDir(_direction);
     }
 }

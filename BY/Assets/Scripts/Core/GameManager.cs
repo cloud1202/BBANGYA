@@ -1,13 +1,39 @@
-using System;
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using UnityEngine;
+using Unity.Netcode;
 
-[ManagerOrder(2)]
 public class GameManager : SingletonInstance<GameManager>, IManager
 {
+    private Dictionary<string, IPlayer> _players = new Dictionary<string, IPlayer>();
 
-    public void StartGame()
-    {}
+    async public UniTask Bootstrap()
+    {
+        await AddressableManager.Instance.SetAddressable();
+        await PrefabManager.Instance.LoadAssetReference();
+    }
+
+    public async UniTask StartGame()
+    {
+        //await PlayerManager.Instance.SpawnLocalPlayer();
+    }
+
+    public async UniTask OnClientJoined()
+    {
+        await PlayerManager.Instance.SpawnLocalPlayer();
+    }
+
+    public void RegistPlayer(IPlayer player)
+    {
+        _players.Add(player.Name, player);
+    }
+
+    public void UnregistPlayer(IPlayer player)
+    {
+        _players.Remove(player.Name);
+    }
+
+    public void AttackPlayer(string uid)
+    {
+        _players[uid].OnDead();
+    }
 }
-
