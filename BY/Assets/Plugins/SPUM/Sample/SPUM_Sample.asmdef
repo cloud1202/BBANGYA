@@ -1,0 +1,17 @@
+{
+    "name": "SPUM_Sample",
+    "rootNamespace": "",
+    "references": [
+        "GUID:bb700287ec2987341be2b53335b11a2f",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
