@@ -85458,6 +85458,9 @@ MonoBehaviour:
   DEBUFF_List: []
   DEATH_List: []
   OTHER_List: []
+  SPRINT_List: []
+  HOLDING_List: []
+  JUMP_List: []
 --- !u!222 &4331475940761322826
 CanvasRenderer:
   m_ObjectHideFlags: 0

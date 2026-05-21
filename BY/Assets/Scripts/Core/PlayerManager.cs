@@ -22,7 +22,7 @@ public class PlayerManager : SingletonInstance<PlayerManager>, IManager
         InputManager.Instance.SubscribeToPlayerLeftAttack(OnLeftAttack);
         InputManager.Instance.SubscribeToPlayerSprint(OnSprint);
         InputManager.Instance.SubscribeToPlayerJump(OnJump);
-        // InputManager.Instance.SubscribeToPlayerAim(OnAim, OnAim, OnAim);
+        InputManager.Instance.SubscribeToPlayerAim(OnAim, OnAim, OnAim);
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
     }

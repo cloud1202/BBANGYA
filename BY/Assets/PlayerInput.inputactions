@@ -67,6 +67,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Aim",
+                    "type": "Value",
+                    "id": "b4a473da-309e-430b-bb02-112ea622b8cf",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -188,6 +197,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "LeftAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "266ac05f-fd5e-4385-a684-c2f18bdbc823",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Aim",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

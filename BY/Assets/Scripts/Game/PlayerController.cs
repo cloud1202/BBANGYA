@@ -11,7 +11,7 @@ public class PlayerController : NetworkBehaviour, IPlayer
     private const float CHARACTER_SPEED = 5;
     [SerializeField] private float _force = 5;
     [SerializeField] private SPUM_Prefabs _prefabs;
-    [SerializeField] private Transform _revoler;
+    [SerializeField] private Transform _revolver;
     [SerializeField] private Transform _muzzle;
     private PlayerState _currentState;
     public PlayerState currentState { get => _currentState; }
@@ -343,10 +343,10 @@ public class PlayerController : NetworkBehaviour, IPlayer
         Bullet bullet = _bullets.Count == 0 ? Instantiate(_bullet, this.transform) : _bullets.Dequeue();
         if (_bullets.Count == 0) bullet.Init(gameObject.name, Reload);
 
-        bullet.Firing(_muzzle, (_muzzle.position - _revoler.position).normalized);
+        bullet.Firing(_muzzle, (_muzzle.position - _revolver.position).normalized);
 
         if (delay > 0)
-            _rb2D.AddForce((_revoler.position - _muzzle.position).normalized * _force, ForceMode2D.Impulse);
+            _rb2D.AddForce((_revolver.position - _muzzle.position).normalized * _force, ForceMode2D.Impulse);
     }
 
     private void Reload(Bullet bullet) => _bullets.Enqueue(bullet);

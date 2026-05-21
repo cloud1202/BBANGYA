@@ -1,0 +1,25 @@
+{
+    "Name": "Custom",
+    "Path": "Assets/SPUM/Resources/Addons",
+    "Version": "",
+    "CreationDate": "2025-12-04 16:09:49",
+  "SpumAnimationData": [],
+  "SpumTextureData": [
+    {
+      "Name": "Custom_Helmet_1",
+      "UnitType": "Unit",
+      "PartType": "Helmet",
+      "SubType": "Custom_Helmet_1",
+      "PartSubType": "",
+      "Path": "Addons/Custom/0_Unit/0_Sprite/Helmet/Custom_Helmet_1"
+    },
+    {
+      "Name": "Custom_Weapon_1",
+      "UnitType": "Unit",
+      "PartType": "Weapons",
+      "SubType": "Custom_Weapon_1",
+      "PartSubType": "Gun",
+      "Path": "Addons/Custom/0_Unit/0_Sprite/Weapon/Custom_Weapon_1"
+    }
+  ]
+}

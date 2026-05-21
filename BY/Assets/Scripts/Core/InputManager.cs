@@ -15,6 +15,7 @@ public class InputManager : SingletonInstance<InputManager>, IManager
         Player_LeftAttack,
         Player_Sprint,
         Player_Jump,
+        Player_Aim,
     }
     private PlayerInput _inputHandler;
     public override void Init()
@@ -45,7 +46,10 @@ public class InputManager : SingletonInstance<InputManager>, IManager
                 input = _inputHandler.Player.Sprint;
                 break;
             case InputType.Player_Jump:
-                input = _inputHandler.Player.Sprint;
+                input = _inputHandler.Player.Jump;
+                break;
+            case InputType.Player_Aim:
+                input = _inputHandler.Player.Aim;
                 break;
         }
 
@@ -74,7 +78,7 @@ public class InputManager : SingletonInstance<InputManager>, IManager
 
     public void SubscribeToPlayerRightAttack(Action<CallbackContext> start = null, Action<CallbackContext> perform = null, Action<CallbackContext> cancel = null)
     {
-        SubscribeToInputHandler(InputType.Player_RightAttack, start, perform, cancel);
+        //SubscribeToInputHandler(InputType.Player_RightAttack, start, perform, cancel);
     }
 
     public void SubscribeToPlayerLeftAttack(Action<CallbackContext> start = null, Action<CallbackContext> perform = null, Action<CallbackContext> cancel = null)
@@ -90,5 +94,10 @@ public class InputManager : SingletonInstance<InputManager>, IManager
     public void SubscribeToPlayerJump(Action<CallbackContext> start = null, Action<CallbackContext> perform = null, Action<CallbackContext> cancel = null)
     {
         SubscribeToInputHandler(InputType.Player_Jump, start, perform, cancel);
+    }
+
+    public void SubscribeToPlayerAim(Action<CallbackContext> start = null, Action<CallbackContext> perform = null, Action<CallbackContext> cancel = null)
+    {
+        SubscribeToInputHandler(InputType.Player_Aim, start, perform, cancel);
     }
 }
