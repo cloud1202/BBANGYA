@@ -2487,7 +2487,7 @@ MonoBehaviour:
     Structure: Weapons
     ItemPath: 
     MaskIndex: 0
-    renderer: {fileID: 0}
+    renderer: {fileID: 3987835169421254544}
     Color:
       serializedVersion: 2
       rgba: 4294967295
@@ -2499,7 +2499,7 @@ MonoBehaviour:
     Structure: Weapons
     ItemPath: 
     MaskIndex: 0
-    renderer: {fileID: 0}
+    renderer: {fileID: 2151107717009769619}
     Color:
       serializedVersion: 2
       rgba: 4294967295
