@@ -3,7 +3,35 @@
     "Path": "Assets/SPUM/Resources/Addons",
     "Version": "",
     "CreationDate": "2025-12-04 16:09:49",
-  "SpumAnimationData": [],
+  "SpumAnimationData": [
+    {
+      "index": 0,
+      "Name": "sprint_0.anim",
+      "StateType": "SPRINT",
+      "ClipPath": "Addons/Custom/0_Unit/1_Animation/Sprint/sprint_0.anim",
+      "HasData": true,
+      "UnitType": "Unit",
+      "SubCategory": ""
+    },
+    {
+      "index": 0,
+      "Name": "jump_0.anim",
+      "StateType": "JUMP",
+      "ClipPath": "Addons/Custom/0_Unit/1_Animation/Jump/jump_0.anim",
+      "HasData": true,
+      "UnitType": "Unit",
+      "SubCategory": ""
+    },
+    {
+      "index": 0,
+      "Name": "holding_0.anim",
+      "StateType": "HOLDING",
+      "ClipPath": "Addons/Custom/0_Unit/1_Animation/Holding/holding_0.anim",
+      "HasData": true,
+      "UnitType": "Unit",
+      "SubCategory": ""
+    }
+  ],
   "SpumTextureData": [
     {
       "Name": "Custom_Helmet_1",

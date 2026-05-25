@@ -13,6 +13,7 @@ public class PlayerController : NetworkBehaviour, IPlayer
     [SerializeField] private SPUM_Prefabs _prefabs;
     [SerializeField] private Transform _revolver;
     [SerializeField] private Transform _muzzle;
+    [SerializeField] private Transform _weaponeTr; // ArmL
     private PlayerState _currentState;
     public PlayerState currentState { get => _currentState; }
 
@@ -30,6 +31,7 @@ public class PlayerController : NetworkBehaviour, IPlayer
     [SerializeField] private Bullet _bullet;
     [SerializeField] private Queue<Bullet> _bullets = new Queue<Bullet>();
     private Vector2 _cursorDir;
+    private float _currentWeaponAngle = 0f;
 
     public NetworkVariable<bool> IsDead = new NetworkVariable<bool>(
         false,
@@ -55,6 +57,12 @@ public class PlayerController : NetworkBehaviour, IPlayer
         NetworkVariableWritePermission.Owner
     );
 
+    public NetworkVariable<float> WeaponAngle = new NetworkVariable<float>(
+        0f,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner
+    );
+
     // ─────────────────────────────────────────
     // Spawn 시 초기화
     // ─────────────────────────────────────────
@@ -67,6 +75,7 @@ public class PlayerController : NetworkBehaviour, IPlayer
         IsFacingRight.OnValueChanged += OnFacingChanged;
         AimPosY.OnValueChanged += OnAimPosYChanged;
         IsForward.OnValueChanged += OnIsForwardChanged;
+        WeaponAngle.OnValueChanged += OnWeaponAngleChanged;
 
         if (IsOwner)
         {
@@ -75,7 +84,6 @@ public class PlayerController : NetworkBehaviour, IPlayer
             PlayerManager.Instance.RegisterLocalPlayer(this);
             GameManager.Instance.RegistPlayer(this);
             _camera.enabled = true;
-            Debug.Log($"[PlayerController] 내 캐릭터 스폰 완료 | clientId: {NetworkManager.Singleton.LocalClientId}");
         }
         else
         {
@@ -85,7 +93,7 @@ public class PlayerController : NetworkBehaviour, IPlayer
             ApplyFacing(IsFacingRight.Value);
             ApplyAimPosY(AimPosY.Value);
             ApplyIsForward(IsForward.Value);
-            Debug.Log($"[PlayerController] 상대 캐릭터 스폰 완료");
+            _currentWeaponAngle = WeaponAngle.Value;
         }
     }
 
@@ -94,12 +102,14 @@ public class PlayerController : NetworkBehaviour, IPlayer
         IsFacingRight.OnValueChanged -= OnFacingChanged;
         AimPosY.OnValueChanged -= OnAimPosYChanged;
         IsForward.OnValueChanged -= OnIsForwardChanged;
+        WeaponAngle.OnValueChanged -= OnWeaponAngleChanged;
         base.OnNetworkDespawn();
     }
 
     private void OnFacingChanged(bool oldVal, bool newVal) { if (!IsOwner) ApplyFacing(newVal); }
     private void OnAimPosYChanged(float oldVal, float newVal) { if (!IsOwner) ApplyAimPosY(newVal); }
     private void OnIsForwardChanged(float oldVal, float newVal) { if (!IsOwner) ApplyIsForward(newVal); }
+    private void OnWeaponAngleChanged(float oldVal, float newVal) { if (!IsOwner) _currentWeaponAngle = newVal; }
 
     private void ApplyFacing(bool facingRight)
     {
@@ -108,6 +118,18 @@ public class PlayerController : NetworkBehaviour, IPlayer
 
     private void ApplyAimPosY(float posY) => _prefabs._anim.SetFloat("PosY", posY);
     private void ApplyIsForward(float value) => _prefabs._anim.SetFloat("IsForward", value);
+
+    // ─────────────────────────────────────────
+    // LateUpdate - 애니메이터 이후 ArmL 회전 강제 적용
+    // ─────────────────────────────────────────
+    void LateUpdate()
+    {
+        if (_weaponeTr == null) return;
+
+        // ArmL 위치 기준으로 마우스 방향 회전 적용
+        // 캐릭터가 좌우 반전될 수 있으므로 world rotation으로 적용
+        _weaponeTr.rotation = Quaternion.Euler(0f, 0f, _currentWeaponAngle);
+    }
 
     private void InitVisual()
     {
@@ -189,9 +211,8 @@ public class PlayerController : NetworkBehaviour, IPlayer
 
         switch (state)
         {
-            //case PlayerState.HOLDING: _currentState = PlayerState.HOLDING; break;
             case PlayerState.ATTACK:
-                Shooting().Forget();
+                Shooting();
                 _currentState = PlayerState.ATTACK;
                 break;
             case PlayerState.JUMP: _currentState = PlayerState.JUMP; break;
@@ -199,7 +220,7 @@ public class PlayerController : NetworkBehaviour, IPlayer
         return len;
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc]
     public void TakeDamageServerRpc(float damage)
     {
         if (IsDead.Value) return;
@@ -236,11 +257,10 @@ public class PlayerController : NetworkBehaviour, IPlayer
     public void DoAttack()
     {
         if (!IsOwner) return;
-        if (isAction && currentState != PlayerState.HOLDING && currentState != PlayerState.JUMP) return;
+        if (isAction && currentState != PlayerState.JUMP) return;
 
-        int index = currentState == PlayerState.HOLDING ? 1 : 0;
         isAction = true;
-        SetStateAnimationIndex(PlayerState.ATTACK, index);
+        SetStateAnimationIndex(PlayerState.ATTACK, 0);
         EndPlayerAnimation(PlayStateAnimation(PlayerState.ATTACK)).Forget();
     }
 
@@ -273,11 +293,7 @@ public class PlayerController : NetworkBehaviour, IPlayer
 
     public void DoJump()
     {
-        if (!IsOwner || isAction || !isGround) return;
-        isAction = true;
-        _prefabs._anim.Rebind();
-        SetStateAnimationIndex(PlayerState.JUMP, 0);
-        float animTime = PlayStateAnimation(PlayerState.JUMP);
+        if (!IsOwner || !isGround) return;
         _rb2D.AddForce(((_goalPos - transform.position).normalized + Vector3.up) * CHARACTER_SPEED, ForceMode2D.Impulse);
         LandingPlayerGround().Forget();
     }
@@ -304,9 +320,29 @@ public class PlayerController : NetworkBehaviour, IPlayer
     public void SetCursorPoint(Vector2 pos)
     {
         if (!IsOwner) return;
-        _cursorDir = (Camera.main.ScreenToWorldPoint(pos) - transform.position).normalized;
 
-        bool facingRight = _cursorDir.x > 0;
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(pos);
+        worldPos.z = 0f;
+
+        // ArmL → 마우스 방향으로 각도 계산
+        Vector2 dir = (worldPos - _weaponeTr.position).normalized;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        // 캐릭터가 좌우 반전된 경우 각도 보정
+        // _prefabs scale x가 -1이면 캐릭터가 반전된 상태
+        if (_prefabs.transform.localScale.x < 0)
+            angle = angle + 115f;
+        else
+            angle = angle + 65f;
+
+        _currentWeaponAngle = angle;
+
+        if (Mathf.Abs(Mathf.DeltaAngle(WeaponAngle.Value, angle)) > 0.5f)
+            WeaponAngle.Value = angle;
+
+        _cursorDir = dir;
+
+        bool facingRight = dir.x > 0;
         if (IsFacingRight.Value != facingRight) IsFacingRight.Value = facingRight;
         ApplyFacing(facingRight);
 
@@ -327,26 +363,19 @@ public class PlayerController : NetworkBehaviour, IPlayer
     {
         isGround = false;
         await UniTask.WaitUntil(() => isGround);
-        isAction = false;
     }
 
-    async private UniTask Shooting()
+    private void Shooting()
     {
         if (!IsOwner) return;
-
-        int delay = 0;
-        if (currentState != PlayerState.IDLE && currentState != PlayerState.HOLDING && currentState != PlayerState.JUMP) return;
-        if (currentState == PlayerState.IDLE || currentState == PlayerState.JUMP) delay = 5;
-
-        await UniTask.DelayFrame(delay);
+        if (currentState != PlayerState.IDLE && currentState != PlayerState.JUMP) return;
 
         Bullet bullet = _bullets.Count == 0 ? Instantiate(_bullet, this.transform) : _bullets.Dequeue();
         if (_bullets.Count == 0) bullet.Init(gameObject.name, Reload);
 
+        // Muzzle → Revolver 방향으로 발사
         bullet.Firing(_muzzle, (_muzzle.position - _revolver.position).normalized);
-
-        if (delay > 0)
-            _rb2D.AddForce((_revolver.position - _muzzle.position).normalized * _force, ForceMode2D.Impulse);
+        _rb2D.AddForce((_revolver.position - _muzzle.position).normalized * _force, ForceMode2D.Impulse);
     }
 
     private void Reload(Bullet bullet) => _bullets.Enqueue(bullet);
