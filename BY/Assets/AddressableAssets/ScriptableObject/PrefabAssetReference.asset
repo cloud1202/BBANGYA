@@ -29,9 +29,25 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_EditorAssetChanged: 0
     containLabel: 1
-  - id: 2
+  - id: 100
+    data:
+      m_AssetGUID: af8d8c60a45ff7a4fad4e45819e66493
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_SubObjectGUID: 
+      m_EditorAssetChanged: 0
+    containLabel: 1
+  - id: 101
     data:
       m_AssetGUID: 144621b0102c8154d9ec614f26f7b228
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_SubObjectGUID: 
+      m_EditorAssetChanged: 0
+    containLabel: 1
+  - id: 102
+    data:
+      m_AssetGUID: dc0b172b20d3f8c47af7812e5e95b84e
       m_SubObjectName: 
       m_SubObjectType: 
       m_SubObjectGUID: 

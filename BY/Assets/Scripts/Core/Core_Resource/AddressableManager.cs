@@ -161,6 +161,7 @@ public class AddressableManager : SingletonInstance<AddressableManager>
     }
 
     public async UniTask<T> Instantiate<T>(IAssetResource assetResource, Transform parent, bool isProtected)
+        where T : UnityEngine.Object
     {
         //await Load<GameObject>(assetRef);
 
@@ -169,12 +170,16 @@ public class AddressableManager : SingletonInstance<AddressableManager>
 
         var go = instantiateHandle.Result as GameObject;
         var obj = go.AddComponent<InstantiateObject>();
-
+        assetResource.instance = go;
         if (isProtected == false)
             _instantiateHandles.Add(go);
 
-        obj.SetAssetReference(assetResource.assetRef);
-        return go.GetComponent<T>();
+        obj.SetAssetReference(assetResource);
+
+        if(typeof(T) == typeof(GameObject))
+            return go as T;
+        else
+            return go.GetComponent<T>();
     }
 
 

@@ -10,6 +10,9 @@ public class GameManager : SingletonInstance<GameManager>, IManager
     {
         await AddressableManager.Instance.SetAddressable();
         await PrefabManager.Instance.LoadAssetReference();
+        await PrefabManager.Instance.LoadCanvas();
+        await PrefabManager.Instance.LoadLobbyUI();
+        await PlanetManager.Instance.SpawnPlanets();
     }
 
     public async UniTask StartGame()

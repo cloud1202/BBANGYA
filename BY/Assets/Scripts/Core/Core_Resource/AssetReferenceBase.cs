@@ -143,6 +143,8 @@ public class AssetReferenceBase<E, T> : ScriptableObject
         public ContainLabel containLabel;
 
         public AssetReference assetRef => data;
+        public UnityEngine.Object instance { get; set; }
+        public bool isInstance => instance != null;
     }
     public List<AssetResource> assetDatas;
 }

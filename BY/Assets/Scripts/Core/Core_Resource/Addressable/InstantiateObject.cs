@@ -3,15 +3,16 @@ using UnityEngine.AddressableAssets;
 
 public class InstantiateObject : MonoBehaviour
 {
-    private AssetReference m_assetRef;
+    private IAssetResource m_assetRef;
 
-    public void SetAssetReference(AssetReference assetRef)
+    public void SetAssetReference(IAssetResource assetRef)
     {
         m_assetRef = assetRef;
     }
     private void OnDestroy()
     {
-        m_assetRef.ReleaseAsset();
-        m_assetRef.ReleaseInstance(gameObject);
+        m_assetRef.instance = null;
+        m_assetRef.assetRef.ReleaseAsset();
+        m_assetRef.assetRef.ReleaseInstance(gameObject);
     }
 }

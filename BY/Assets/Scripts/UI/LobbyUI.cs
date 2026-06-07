@@ -16,7 +16,6 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private TMP_InputField joinCodeInput;
 
     [Header("Waiting Panel")]
-    [SerializeField] private TextMeshProUGUI lobbyCodeText;
     [SerializeField] private TextMeshProUGUI statusText;
     [SerializeField] private Button leaveButton;
 
@@ -71,16 +70,12 @@ public class LobbyUI : MonoBehaviour
     {
         ShowWaitingPanel();
         string code = NetworkGameManager.Instance.GetLobbyCode();
-        lobbyCodeText.text = !string.IsNullOrEmpty(code)
-            ? $"방 코드: <b>{code}</b>"
-            : "상대방 기다리는 중...";
         SetStatus("상대방 기다리는 중...");
     }
 
     private void OnLobbyJoined()
     {
         ShowWaitingPanel();
-        lobbyCodeText.text = "매칭 완료!";
         SetStatus("게임 시작 중...");
     }
 

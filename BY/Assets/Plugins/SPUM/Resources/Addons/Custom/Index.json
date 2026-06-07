@@ -30,6 +30,42 @@
       "HasData": true,
       "UnitType": "Unit",
       "SubCategory": ""
+    },
+    {
+      "index": 0,
+      "Name": "Custom_idle_0.anim",
+      "StateType": "IDLE",
+      "ClipPath": "Addons/Custom/0_Unit/1_Animation/Idle/Custom_idle_0.anim",
+      "HasData": true,
+      "UnitType": "Unit",
+      "SubCategory": ""
+    },
+    {
+      "index": 1,
+      "Name": "Custom_idle_1.anim",
+      "StateType": "IDLE",
+      "ClipPath": "Addons/Custom/0_Unit/1_Animation/Idle/Custom_idle_1.anim",
+      "HasData": true,
+      "UnitType": "Unit",
+      "SubCategory": ""
+    },
+    {
+      "index": 0,
+      "Name": "Custom_move_0.anim",
+      "StateType": "MOVE",
+      "ClipPath": "Addons/Custom/0_Unit/1_Animation/Move/Custom_move_0.anim",
+      "HasData": true,
+      "UnitType": "Unit",
+      "SubCategory": ""
+    },
+    {
+      "index": 0,
+      "Name": "Custom_attack_0.anim",
+      "StateType": "ATTACK",
+      "ClipPath": "Addons/Custom/0_Unit/1_Animation/Attack/Custom_attack_0.anim",
+      "HasData": true,
+      "UnitType": "Unit",
+      "SubCategory": ""
     }
   ],
   "SpumTextureData": [
@@ -42,12 +78,52 @@
       "Path": "Addons/Custom/0_Unit/0_Sprite/Helmet/Custom_Helmet_1"
     },
     {
-      "Name": "Custom_Weapon_1",
+      "Name": "Custom_Cloth_1",
       "UnitType": "Unit",
-      "PartType": "Weapons",
-      "SubType": "Custom_Weapon_1",
-      "PartSubType": "Gun",
-      "Path": "Addons/Custom/0_Unit/0_Sprite/Weapon/Custom_Weapon_1"
+      "PartType": "Cloth",
+      "SubType": "Body",
+      "PartSubType": "",
+      "Path": "Addons/Custom/0_Unit/0_Sprite/Cloth/Custom_Cloth_1"
+    },
+    {
+      "Name": "Custom_Cloth_1",
+      "UnitType": "Unit",
+      "PartType": "Cloth",
+      "SubType": "Right",
+      "PartSubType": "",
+      "Path": "Addons/Custom/0_Unit/0_Sprite/Cloth/Custom_Cloth_1"
+    },
+    {
+      "Name": "Custom_Cloth_1",
+      "UnitType": "Unit",
+      "PartType": "Cloth",
+      "SubType": "Left",
+      "PartSubType": "",
+      "Path": "Addons/Custom/0_Unit/0_Sprite/Cloth/Custom_Cloth_1"
+    },
+    {
+      "Name": "Custom_Pant_1",
+      "UnitType": "Unit",
+      "PartType": "Pant",
+      "SubType": "Right",
+      "PartSubType": "",
+      "Path": "Addons/Custom/0_Unit/0_Sprite/Pant/Custom_Pant_1"
+    },
+    {
+      "Name": "Custom_Pant_1",
+      "UnitType": "Unit",
+      "PartType": "Pant",
+      "SubType": "Left",
+      "PartSubType": "",
+      "Path": "Addons/Custom/0_Unit/0_Sprite/Pant/Custom_Pant_1"
+    },
+    {
+      "Name": "Custom_Helmet_2",
+      "UnitType": "Unit",
+      "PartType": "Helmet",
+      "SubType": "Custom_Helmet_2",
+      "PartSubType": "",
+      "Path": "Addons/Custom/0_Unit/0_Sprite/Helmet/Custom_Helmet_2"
     }
   ]
 }

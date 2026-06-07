@@ -13,7 +13,7 @@ using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.Events;
 
-[ManagerOrder(3)]
+[ManagerOrder(2)]
 public class NetworkGameManager : SingletonInstance<NetworkGameManager>, IManager
 {
     private int maxPlayers = 2;
@@ -91,7 +91,6 @@ public class NetworkGameManager : SingletonInstance<NetworkGameManager>, IManage
 
             SetRelayHostData(allocation);
             NetworkManager.Singleton.StartHost();
-            await GameManager.Instance.StartGame();
 
             Debug.Log($"[NGM] 로비 생성 완료 | 코드: {_lobbyCode}");
             OnLobbyCreated?.Invoke();

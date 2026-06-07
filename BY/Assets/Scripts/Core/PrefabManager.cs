@@ -1,69 +1,57 @@
 using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
 using UnityEngine;
-using static AssetReferenceBase<PrefabManager.Prefabs_Data, UnityEngine.GameObject>;
+using UnityEngine.InputSystem;
 
 
-[ManagerOrder(3)]
-public class PrefabManager : SingletonInstance<PrefabManager>, IManager
+[ManagerOrder(4)]
+public class PrefabManager : ReferenceManager<PrefabManager, PrefabData>, IManager
 {
-    private PrefabAssetReference _assetReference;
-    private Dictionary<Prefabs_Data, AssetResource> _objectAssetMap = new Dictionary<Prefabs_Data, AssetResource>();
-    public enum Prefabs_Data
-    {
-        Player,
-        Ground,
-        LobbyCanvas,
-    }
+
+    private Canvas _canvas;
 
     public override void Init()
     {
         base.Init();
+        InputManager.Instance.SubscribeToInputHandler(InputType.UI_Setting, OnESC);
     }
 
-    async public UniTask LoadAssetReference()
+    async public UniTask LoadCanvas()
     {
-        _assetReference = await AddressableManager.Instance.LoadResourceData<PrefabAssetReference>(nameof(PrefabAssetReference));
-        AssetReferenceMapping();
-        await PreloadAssets(ContainLabel.Common);
+        _canvas = await InstantiateObject<Canvas>(PrefabData.MainCanvas, this.transform, true);
+    }
+    async public UniTask LoadLobbyUI()
+    {
+        await InstantiateUI<GameObject>(PrefabData.LobbyUI);
     }
 
-    private void AssetReferenceMapping()
+    public void OnESC(InputAction.CallbackContext context)
     {
-        foreach (var obj in _assetReference.assetDatas)
+        // 인게임인지 확인
+        LoadSettingUI().Forget();
+    }
+
+    async private UniTask LoadSettingUI()
+    {
+        await InstantiateUI<GameObject>(PrefabData.SettingUI);
+    }
+
+    async public UniTask<TI> InstantiateUI<TI>(PrefabData data, Transform parent = null, bool isProtected = false) where TI : UnityEngine.Object
+    {
+        if (_assetMap.TryGetValue(data, out var obj) == false)
         {
-            if (!_objectAssetMap.ContainsKey(obj.id))
-            {
-                _objectAssetMap.Add(obj.id, obj);
-            }
-        }
-    }
-
-    public async UniTask PreloadAssets(ContainLabel label)
-    {
-        List<AssetResource> assets = new List<AssetResource>();
-
-        foreach (var obj in _assetReference.assetDatas)
-        {
-            if ((obj.containLabel & label) > 0)
-            {
-                assets.Add(obj);
-            }
-        }
-        Debug.Log($"{assets.Count}");
-        await AddressableManager.Instance.PreloadAssets(label, assets.ToArray());
-    }
-
-    public async UniTask<T> InstantiateObject<T>(Prefabs_Data data, Transform parent = null, bool isProtected = false) where T : Object
-    {
-        if (_objectAssetMap.TryGetValue(data, out var obj) == false)
-        {
+            Logging($"Not Find AssetReference! {data}");
             return default;
+        }
+        
+        if (obj.isInstance)
+        {
+            Logging($"Current Use Instance! {data}");
+            return obj.isInstance as TI;
         }
 
         if (parent == null)
-            parent = this.transform;
+            parent = _canvas.transform;
 
-        return await AddressableManager.Instance.Instantiate<T>(obj, parent, isProtected);
+        return await AddressableManager.Instance.Instantiate<TI>(obj, parent, isProtected);
     }
 }

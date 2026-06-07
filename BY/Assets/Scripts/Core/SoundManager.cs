@@ -1,16 +1,17 @@
 using UnityEngine;
+using UnityEngine.Events;
 
-public class SoundManager : SingletonInstance<SoundManager>
+[ManagerOrder(6)]
+public class SoundManager : ReferenceManager<SoundManager, SoundData>, IManager
 {
-    private const float DEFAULT_SOUND_VOLUM = 1.0f;
+    private const float DEFAULT_SOUND_VOLUM = 0.5f;
 
-    public delegate void UpdateVolumDelegate(float volumPer);
-
-    private UpdateVolumDelegate _updateSoundVolumEvent = null;
+    private UnityAction<float> _updateSoundVolumEvent = null;
+    private UnityAction<float> _updateBGMVolumEvent = null;
+    private UnityAction<float> _updateSFXVolumEvent = null;
 
     [SerializeField] private AudioSource _bgmAudio;
-    [SerializeField] private AudioSource _clickAudio;
-    [SerializeField] private AudioSource _missAudio;
+    [SerializeField] private AudioSource _sfxAudio;
 
     private float _soundVolumPer;
     public float SoundVolumPer
@@ -22,40 +23,102 @@ public class SoundManager : SingletonInstance<SoundManager>
                 return;
 
             _soundVolumPer = value;
-            _updateSoundVolumEvent(value);
+            _updateSoundVolumEvent?.Invoke(value);
+        }
+    }
+
+    private float _bgmVolumPer;
+    public float BGMVolumPer
+    {
+        get { return _bgmVolumPer; }
+        set
+        {
+            if (_bgmVolumPer == value)
+                return;
+
+            _bgmVolumPer = value;
+            _updateBGMVolumEvent?.Invoke(value);
+        }
+    }
+
+    private float _sfxVolumPer;
+    public float SFXVolumPer
+    {
+        get { return _sfxVolumPer; }
+        set
+        {
+            if (_sfxVolumPer == value)
+                return;
+
+            _sfxVolumPer = value;
+            _updateSFXVolumEvent?.Invoke(value);
         }
     }
 
     public override void Init()
     {
         base.Init();
+        CreateBGMAudio();
+        CreateSFXAudio();
+
         _updateSoundVolumEvent += UpdateVolum;
+        _updateBGMVolumEvent += UpdateBGMVolum;
+        _updateSFXVolumEvent += UpdateSFXVolum;
         SoundVolumPer = 0.5f;
+    }
+
+    private void CreateBGMAudio()
+    {
+        var go = new GameObject("BGM");
+        _bgmAudio = go.AddComponent<AudioSource>();
+        _bgmAudio.playOnAwake = false;
+        _bgmAudio.loop = true;
+        go.transform.SetParent(this.transform);
+    }
+
+    private void CreateSFXAudio()
+    {
+        var go = new GameObject("SFX");
+        _sfxAudio = go.AddComponent<AudioSource>();
+        _sfxAudio.playOnAwake = false;
+        go.transform.SetParent(this.transform);
     }
 
     private void UpdateVolum(float volumPer)
     {
-        _bgmAudio.volume = DEFAULT_SOUND_VOLUM * volumPer;
-        _clickAudio.volume = DEFAULT_SOUND_VOLUM * volumPer;
-        _missAudio.volume = DEFAULT_SOUND_VOLUM * volumPer;
+        _bgmAudio.volume = DEFAULT_SOUND_VOLUM * _bgmVolumPer * volumPer;
+        _sfxAudio.volume = DEFAULT_SOUND_VOLUM * _sfxVolumPer * volumPer;
     }
 
-    public void PlayClick()
+    private void UpdateBGMVolum(float volumPer)
     {
-        _clickAudio.PlayOneShot(_clickAudio.clip);
+        _bgmAudio.volume = DEFAULT_SOUND_VOLUM  * volumPer;
     }
 
-    public void PlayMiss()
+    private void UpdateSFXVolum(float volumPer)
     {
-        _missAudio.PlayOneShot(_missAudio.clip);
+        _sfxAudio.volume = DEFAULT_SOUND_VOLUM  * volumPer;
     }
 
-    public void SubscribeToSoundHandler(UpdateVolumDelegate subscribeEvent)
+    public void PlayBGM(SoundData sound)
+    {
+    }
+
+    public void PlaySFX(SoundData sound)
+    {
+    }
+
+    public void SubscribeToSoundHandler(UnityAction<float> subscribeEvent)
     {
         if (subscribeEvent == null)
             return;
 
         _updateSoundVolumEvent += subscribeEvent;
         subscribeEvent(SoundVolumPer);
+    }
+
+    public void UnsubscribeToSoundHandler(UnityAction<float> subscribeEvent)
+    {
+        _updateSoundVolumEvent -= subscribeEvent;
     }
 }

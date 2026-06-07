@@ -47,18 +47,19 @@ public class Bullet : MonoBehaviour
             Reload();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         if (!_isFiring) return;
 
+        Debug.Log($"Hit Object : {collision.gameObject.name} :: {_ownerName}");
         // 오너 자신은 무시
         if (collision.gameObject.name == _ownerName) return;
-
+        
         // 플레이어 히트
-        PlayerController player = collision.GetComponent<PlayerController>();
+        PlayerController player = collision.gameObject.GetComponent<PlayerController>();
         if (player != null)
         {
-            player.TakeDamageServerRpc(1f);
+            player.TakeDamageServerRpc();
         }
 
         Reload();

@@ -2,7 +2,6 @@ using Cysharp.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static PrefabManager;
 
 [ManagerOrder(5)]
 public class PlayerManager : SingletonInstance<PlayerManager>, IManager
@@ -17,12 +16,12 @@ public class PlayerManager : SingletonInstance<PlayerManager>, IManager
 
     void Start()
     {
-        InputManager.Instance.SubscribeToPlayerMove(OnMove, OnMove, OnMove);
-        InputManager.Instance.SubscribeToPlayerRightAttack(OnRightAttack, null, OnRightAttackCancel);
-        InputManager.Instance.SubscribeToPlayerLeftAttack(OnLeftAttack);
-        InputManager.Instance.SubscribeToPlayerSprint(OnSprint);
-        InputManager.Instance.SubscribeToPlayerJump(OnJump);
-        InputManager.Instance.SubscribeToPlayerAim(OnAim, OnAim, OnAim);
+        InputManager.Instance.SubscribeToInputHandler(InputType.Player_Move, OnMove, OnMove, OnMove);
+        //InputManager.Instance.SubscribeToInputHandler(InputType.Player_RightAttack, OnRightAttack, null, OnRightAttackCancel);
+        InputManager.Instance.SubscribeToInputHandler(InputType.Player_LeftAttack, OnLeftAttack);
+        InputManager.Instance.SubscribeToInputHandler(InputType.Player_Sprint, OnSprint);
+        InputManager.Instance.SubscribeToInputHandler(InputType.Player_Jump, OnJump);
+        InputManager.Instance.SubscribeToInputHandler(InputType.Player_Aim, OnAim, OnAim, OnAim);
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
     }
@@ -54,7 +53,7 @@ public class PlayerManager : SingletonInstance<PlayerManager>, IManager
             ? new Vector3(-5f, 0f, 0f)
             : new Vector3(5f, 0f, 0f);
 
-        InstantiateObject playerObj = await PrefabManager.Instance.InstantiateObject<InstantiateObject>(Prefabs_Data.Player, null);
+        InstantiateObject playerObj = await PrefabManager.Instance.InstantiateObject<InstantiateObject>(PrefabData.Player, null);
 
         if (playerObj == null)
         {
